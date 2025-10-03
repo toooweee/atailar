@@ -1,13 +1,13 @@
-export type Env = {
-  REACT_APP_HOST: string
-}
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-export {};
-
-declare global {
-  interface Window {
-    env: {
-      VITE_SERVICES_HOST: string;
-    };
-  }
-}
+export default defineConfig({
+  plugins: [react()],
+  define: {
+    global: 'window',
+  },
+  server: {
+    host: true,
+    port: 5174,
+  },
+})

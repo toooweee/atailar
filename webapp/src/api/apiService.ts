@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import jwtDecode from 'jwt-decode'; // Установи jwt-decode: npm install jwt-decode @types/jwt-decode
+import { eraseCookie, getCookie, setCookie } from '../utils/cookieService';
 
 interface ApiResponse<T = any> {
   data: T;
@@ -26,10 +27,11 @@ export class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true, // Для отправки cookies с запросами (если сервер поддерживает)
     });
 
     this.axiosInstance.interceptors.request.use((config) => {
-      const token = localStorage.getItem('authToken');
+      const token = getCookie('authToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -44,7 +46,7 @@ export class ApiService {
           errorMessage = error.response.data.message;
         } else if (error.response?.status === 401) {
           errorMessage = 'Сессия истекла. Пожалуйста, войдите заново.';
-          this.clearAuthToken(); //todo перезапрос токена
+          this.clearAuthToken(); // todo перезапрос токена
         } else if (error.response?.status === 403) {
           errorMessage = 'Доступ запрещен.';
         } else if (error.response?.status === 404) {
@@ -105,12 +107,31 @@ export class ApiService {
     }
   }
 
+  getCurrentRole(): string | null {
+    let role = getCookie('userRole');
+    if (!role) {
+      const token = getCookie('authToken');
+      if (token) {
+        role = this.getRoleFromToken(token);
+        if (role) {
+          setCookie('userRole', role, 7);
+        }
+      }
+    }
+    return role;
+  }
+
   setAuthToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    setCookie('authToken', token, 7);
+    const role = this.getRoleFromToken(token);
+    if (role) {
+      setCookie('userRole', role, 7);
+    }
   }
 
   clearAuthToken(): void {
-    localStorage.removeItem('authToken');
+    eraseCookie('authToken');
+    eraseCookie('userRole');
   }
 }
 
