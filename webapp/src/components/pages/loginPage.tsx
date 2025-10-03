@@ -7,10 +7,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { showMessage } = useSnackbar();
 
-  const [form, setForm] = useState<{
-    userName: string | null,
-    password: string | null
-  }>({ userName: null, password: null });
+  const [form, setForm] = useState({ userName: '', password: '' });
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
