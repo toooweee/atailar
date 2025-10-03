@@ -1,7 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+export type Env = {
+  REACT_APP_HOST: string
+}
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
+export {};
+
+declare global {
+  interface Window {
+    env: {
+      VITE_SERVICES_HOST: string;
+    };
+  }
+}
