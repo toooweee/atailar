@@ -12,7 +12,7 @@ export {};
 declare global {
   interface Window {
     env: {
-      VITE_SERVICES_HOST: string;
+      REACT_APP_HOST: string;
     };
   }
 }
