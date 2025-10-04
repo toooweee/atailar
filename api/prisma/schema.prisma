@@ -26,14 +26,30 @@ enum EventType {
 }
 
 model User {
-  id           String @id @default(uuid())
-  email        String @unique
+  id           String  @id @default(uuid())
+  email        String  @unique
   passwordHash String
-  role         Role   @default(USER)
+  role         Role    @default(USER)
+  isFirstLogin Boolean @default(true)
 
   secrets        Secret[]
   accessRequests AccessRequest[]
   auditLogs      AuditLog[]
+  refreshTokens  RefreshToken[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    String?  @unique
+  tokenHash String   @unique
+  expiresAt DateTime @map("expires_at")
+  revoked   Boolean  @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
 }
 
 model Secret {
