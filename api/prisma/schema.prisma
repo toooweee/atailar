@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum StatusRequest {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EventType {
+  LOGGED_IN
+  SEND_BID
+  APPROVE_BID
+}
+
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  passwordHash String
+  role         Role   @default(USER)
+
+  secrets        Secret[]
+  accessRequests AccessRequest[]
+  auditLogs      AuditLog[]
+}
+
+model Secret {
+  id             String  @id @default(uuid())
+  name           String  @unique
+  encryptedValue String
+  ownerId        String?
+
+  createdAt DateTime @default(now())
+
+  user           User?           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  accessRequests AccessRequest[]
+}
+
+model AccessRequest {
+  id       String        @id @default(uuid())
+  userId   String?
+  secretId String?
+  comment  String
+  status   StatusRequest
+
+  createdAt DateTime @default(now())
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  secret Secret? @relation(fields: [secretId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String    @id @default(uuid())
+  userId    String?
+  action    String
+  details   String
+  eventType EventType
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
