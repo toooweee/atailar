@@ -8,6 +8,8 @@ import { EnvModule } from '../env/env.module';
 import { UsersModule } from '../users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
+import { EncryptionModule } from '../encryption/encryption.module';
+import { RefreshTokenGuard } from './guards/refresh.guard';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { AuthGuard } from './guards/auth.guard';
       }),
       inject: [EnvService],
     }),
+    EncryptionModule
   ],
   providers: [
     AuthService,
@@ -30,6 +33,7 @@ import { AuthGuard } from './guards/auth.guard';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    RefreshTokenGuard
   ],
   controllers: [AuthController],
 })

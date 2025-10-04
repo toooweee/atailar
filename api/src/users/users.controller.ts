@@ -12,7 +12,6 @@ import { Roles } from '@app/common/decorators/roles.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // admin
   @UseGuards(RolesGuard)
   @Roles([Role.ADMIN])
   @Post()
@@ -20,7 +19,8 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
-  // admin
+  @UseGuards(RolesGuard)
+  @Roles([Role.ADMIN])
   @Get()
   findAll() {
     return this.usersService.findAll();

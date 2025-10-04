@@ -10,6 +10,12 @@ export class Env {
 
   @IsString()
   AT_EXPIRES_IN: string;
+
+  @IsString()
+  RT_JWT_SECRET: string;
+
+  @IsString()
+  RT_EXPIRES_IN: string;
 }
 
 export function validate(config: Record<string, unknown>) {
