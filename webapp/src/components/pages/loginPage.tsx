@@ -4,16 +4,13 @@ import { TextField, Button, Box, Typography, Alert, Container, Avatar } from '@m
 import type { LoginRequest } from '../../api/auth/types/request/LoginRequest.ts';
 import { authApi } from '../../api/auth/AuthApi.ts';
 import { Roles } from '../../api/auth/types/eunms/Roles.ts';
-import { useLoading } from '../../hooks/useLoading.ts';
 import { getAccessToken, getCurrentRole } from '../../utils/tokenAndRoleUtils.ts';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  // const { showMessage } = useSnackbar();
 
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
-  const { loading, withLoading } = useLoading();
 
   useEffect(() => {
     const token = getAccessToken();
@@ -34,9 +31,9 @@ const LoginPage: React.FC = () => {
   };
 
   const fetchTokenAndMeInfo = async () => {
-    const data = await withLoading(() => authApi.login(form));
+    const data = await authApi.login(form);
     if (data) {
-      const meInfo = await withLoading(() => authApi.getMeInformation());
+      const meInfo = await authApi.getMeInformation();
       console.log(meInfo);
       if (meInfo) {
         navigatePage(meInfo.role)

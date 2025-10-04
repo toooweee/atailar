@@ -5,7 +5,7 @@ import type { ApiService } from '../apiService.ts';
 import type { LoginRequest } from './types/request/LoginRequest.ts';
 import type { AuthResponse } from './types/response/AuthResponse.ts';
 import type { MeResponse } from './types/response/MeResponse.ts';
-import type { ResponseResult } from '../request/types/ResponseResult.ts';
+import type { ResponseResult } from '../types/ResponseResult.ts';
 
 export class AuthApi {
   private api: ApiService;

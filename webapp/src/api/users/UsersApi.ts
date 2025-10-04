@@ -4,7 +4,6 @@ import type { ApiService } from '../apiService.ts';
 import type { UserInfo } from './types/response/UserInfo.ts';
 import type { CreateUser } from './types/request/CreateUser.ts';
 import type { ChangePassword } from './types/request/ChangePassword.ts';
-import type { ResponseResult } from '../request/types/ResponseResult.ts';
 import type { UserPayload } from './types/response/UserPayload.ts';
 
 export class UsersApi {
