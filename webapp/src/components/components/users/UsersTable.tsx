@@ -1,4 +1,3 @@
-// src/components/users/UsersTable.tsx
 import React from 'react';
 import { Typography } from '@mui/material';
 import UsersListTable from './UsersListTable.tsx';

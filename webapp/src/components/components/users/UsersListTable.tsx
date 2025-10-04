@@ -1,4 +1,3 @@
-// src/components/users/UsersListTable.tsx
 import React from 'react';
 import {
   Table,

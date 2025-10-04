@@ -1,4 +1,3 @@
-// src/components/users/UsersListItem.tsx
 import React from 'react';
 import {
   TableRow,

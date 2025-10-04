@@ -18,7 +18,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 interface PasswordChangeModalProps {
   open: boolean;
   userId: string;
-  onClose: () => void;
   onSubmit: (userId: string, newPassword: string) => Promise<boolean>;
   loading?: boolean;
   error?: string;
@@ -27,7 +26,6 @@ interface PasswordChangeModalProps {
 const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
                                                                    open,
                                                                    userId,
-                                                                   onClose,
                                                                    onSubmit,
                                                                    loading = false,
                                                                    error,
@@ -53,13 +51,12 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
     if (success) {
       setNewPassword('');
       setConfirmPassword('');
-      onClose();
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Сменить пароль для пользователя</DialogTitle>
+    <Dialog open={open} maxWidth="sm" fullWidth>
+      <DialogTitle>Установите новый пароль</DialogTitle>
       <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
         <DialogContent>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -106,7 +103,6 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Отмена</Button>
           <Button type="submit" variant="contained" disabled={loading || !newPassword || !confirmPassword}>
             {loading ? <CircularProgress size={24} /> : 'Сменить пароль'}
           </Button>

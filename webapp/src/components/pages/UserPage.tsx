@@ -14,7 +14,7 @@ import {
   Tooltip,
   Menu,
   MenuItem,
-  Divider
+  Divider,
 } from '@mui/material';
 import {
   Security as SecurityIcon,
@@ -22,7 +22,7 @@ import {
   Person as PersonIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
-  Notifications as NotificationsIcon
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentRole } from '../../utils/tokenAndRoleUtils.ts';
@@ -31,6 +31,8 @@ import { authApi } from '../../api/auth/AuthApi.ts';
 import RequestCreateForm from '../components/request/RequestCreateForm.tsx';
 import UserRequestsList from '../components/request/UserRequestsList.tsx';
 import UserSecretsList from '../components/secret/UserSecretsList.tsx';
+import { usersApi } from '../../api/users/UsersApi.ts';
+import UserPasswordChangeModal from '../components/users/UserPasswordChangeModal.tsx';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -61,9 +63,13 @@ function TabPanel(props: TabPanelProps) {
 const UserPage = () => {
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState(0);
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<UserPayload | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const role = getCurrentRole();
 
@@ -77,6 +83,10 @@ const UserPage = () => {
       try {
         const info = await authApi.getMeInformation();
         setUserInfo(info);
+        if (info?.isFirstLogin) {
+          setMustChangePassword(true);
+          setShowPasswordModal(true);
+        }
       } catch (error) {
         console.error('Failed to load user info:', error);
       }
@@ -84,6 +94,48 @@ const UserPage = () => {
 
     loadUserInfo();
   }, [role, navigate]);
+
+  const handlePasswordSubmit = async (newPassword: string): Promise<boolean> => {
+    try {
+      setPasswordLoading(true);
+      setPasswordError(null);
+      const result = await usersApi.changePassword({ newPassword });
+      if (result) {
+        setUserInfo({ ...userInfo!, isFirstLogin: false });
+        setMustChangePassword(false);
+        setShowPasswordModal(false);
+        return true;
+      }
+      return false;
+    } catch (err: any) {
+      setPasswordError(err.toString());
+      return false;
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handlePasswordClose = () => {
+    if (mustChangePassword) {
+      return;
+    }
+    setShowPasswordModal(false);
+    setPasswordError(null);
+  };
+
+  if (mustChangePassword) {
+    return (
+      <Box sx={{ flexGrow: 1, bgcolor: 'background.default', minHeight: '100vh' }}>
+        <UserPasswordChangeModal
+          open={showPasswordModal}
+          onClose={handlePasswordClose}
+          onSubmit={handlePasswordSubmit}
+          loading={passwordLoading}
+          error={passwordError || undefined}
+        />
+      </Box>
+    );
+  }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -110,7 +162,7 @@ const UserPage = () => {
 
   const handleCreateRequest = () => {
     setShowCreateForm(true);
-    setCurrentTab(1)
+    setCurrentTab(1);
   };
 
   const handleRequestCreated = () => {
@@ -145,13 +197,13 @@ const UserPage = () => {
               icon={<PersonIcon />}
               label={userInfo?.email || 'Пользователь'}
               variant="outlined"
-              color='default'
+              color="default"
               onClick={handleMenuOpen}
               sx={{
                 cursor: 'pointer',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
               }}
             />
 
@@ -193,8 +245,8 @@ const UserPage = () => {
                 '& .MuiTab-root': {
                   textTransform: 'none',
                   fontSize: '1rem',
-                  fontWeight: 500
-                }
+                  fontWeight: 500,
+                },
               }}
             >
               <Tab
@@ -248,6 +300,14 @@ const UserPage = () => {
           </TabPanel>
         </Paper>
       </Container>
+
+      <UserPasswordChangeModal
+        open={showPasswordModal}
+        onClose={handlePasswordClose}
+        onSubmit={handlePasswordSubmit}
+        loading={passwordLoading}
+        error={passwordError || undefined}
+      />
     </Box>
   );
 };
