@@ -7,7 +7,8 @@ export class AccessRequestsService {
   }
 
   create() {
-    // отправить на email
+    // сохранить заявку в бд
+    // отправить на email заявка с кнопками на одобрение и отклонение заявки
   }
 
   findAll() {}

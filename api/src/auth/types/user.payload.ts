@@ -4,4 +4,5 @@ export class UserPayload {
   sub: string;
   email: string;
   role: Role;
+  isFirstLogin: boolean;
 }

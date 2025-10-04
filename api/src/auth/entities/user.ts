@@ -8,6 +8,7 @@ export class UserM {
   @Exclude()
   passwordHash: string;
   role?: Role;
+  isFirstLogin?: boolean;
 
   createdAt?: Date;
 }

@@ -14,12 +14,17 @@ export class UsersService {
   async createUser(dto: CreateUserDto) {
     const passwordHash = await this.encryptionService.hashPassword(dto.password);
 
-    return this.prisma.user.create({
+
+    const user = await this.prisma.user.create({
       data: {
         email: dto.email,
         passwordHash,
       },
     });
+
+    // send credentials to email
+
+    return user;
   }
 
   async findOneByEmail(email: string) {

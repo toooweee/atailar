@@ -25,11 +25,24 @@ export class AuthService {
     const user = await this.usersService.validateUser(dto.email, dto.password);
 
     const { accessToken, refreshToken } = await this.issuingTokens(user);
+
+
     return { accessToken, refreshToken };
   }
 
   async me(userId: string) {
     const user = await this.usersService.findOneById(userId);
+
+    if(user.isFirstLogin) {
+      await this.prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          isFirstLogin: false
+        }
+      })
+    }
 
     return user;
   }
@@ -82,6 +95,7 @@ export class AuthService {
       sub: user.id!,
       email: user.email,
       role: user.role!,
+      isFirstLogin: user.isFirstLogin!
     });
 
     const expiresAt = this.getRtExp();
