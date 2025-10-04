@@ -1,33 +1,46 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import * as generator from 'generate-password';
+
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { EncryptionService } from '../encryption/encryption.service';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { MailService } from '../mail/mail.service';
+import { UserM } from './entities/user';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly encryptionService: EncryptionService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
 
   async createUser(dto: CreateUserDto) {
-    const passwordHash = await this.encryptionService.hashPassword(dto.password);
+    const password = generator.generate({
+      length: 12,
+      numbers: true,
+      symbols: true,
+      uppercase: true,
+      lowercase: true,
+      excludeSimilarCharacters: true,
+    });
+    console.log(password);
+
+    const passwordHash = await this.encryptionService.hashPassword(password);
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
+        fullName: dto.fullName,
         passwordHash,
       },
     });
 
-    // send credentials to email
     await this.mailService.sendEmail({
       to: dto.email,
       subject: 'Добро пожаловать в Secret Desc!',
-       from: 'SECRET DESC',
+      from: 'SECRET DESC',
       html: `
   <div style="font-family: Arial, sans-serif; background-color: #f7f9fc; padding: 24px;">
     <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
@@ -39,7 +52,7 @@ export class UsersService {
       <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
         <p style="margin: 0; color: #333;">
           <strong>Email:</strong> ${dto.email}<br>
-          <strong>Пароль:</strong> ${dto.password}
+          <strong>Пароль:</strong> ${password}
         </p>
       </div>
 
@@ -62,8 +75,7 @@ export class UsersService {
   `,
     });
 
-
-    return user;
+    return new UserM(user);
   }
 
   async findOneByEmail(email: string) {
@@ -90,29 +102,31 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany();
+    const users = await this.prisma.user.findMany();
+    return users.map((u) => new UserM(u));
   }
 
   async changePassword(id: string, dto: ChangePasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id
-      }
-    })
-    if(!user) {
-      throw new NotFoundException('User not found')
+        id,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
     const passwordHash = await this.encryptionService.hashPassword(dto.newPassword);
 
-    return this.prisma.user.update({
+    const newUser = await this.prisma.user.update({
       where: {
-        id
+        id,
       },
       data: {
-        passwordHash
-      }
+        passwordHash,
+      },
     });
+    return new UserM(newUser);
   }
 
   async validateUser(email: string, password: string) {
