@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { EncryptionService } from '../encryption/encryption.service';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,15 +49,37 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
+  async changePassword(id: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id
+      }
+    })
+    if(!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    const passwordHash = await this.encryptionService.hashPassword(dto.newPassword);
+
+    return this.prisma.user.update({
+      where: {
+        id
+      },
+      data: {
+        passwordHash
+      }
+    });
+  }
+
   async validateUser(email: string, password: string) {
     const user = await this.findOneByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Email Or Password Not Valid');
+      throw new BadRequestException('Email Or Password Not Valid');
     }
 
     const isValidPassword = await this.encryptionService.verifyPassword(password, user.passwordHash);
     if (!isValidPassword) {
-      throw new UnauthorizedException('Email Or Password Not Valid');
+      throw new BadRequestException('Email Or Password Not Valid');
     }
 
     return user;

@@ -7,6 +7,7 @@ import { validate } from './env/env';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { SeedModule } from './seed/seed.module';
+import { AccessRequestsModule } from './access-requests/access-requests.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SeedModule } from './seed/seed.module';
     PrismaModule,
     UsersModule,
     SeedModule,
+    AccessRequestsModule,
   ],
 })
 export class AppModule {}
