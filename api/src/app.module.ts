@@ -7,19 +7,25 @@ import { validate } from './env/env';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { SeedModule } from './seed/seed.module';
+import { AccessRequestsModule } from './access-requests/access-requests.module';
+import { MailModule } from './mail/mail.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
     }),
-    AuthModule,
     EncryptionModule,
     EnvModule,
     PrismaModule,
     UsersModule,
     SeedModule,
+    AccessRequestsModule,
+    MailModule,
+    AuditLogsModule,
   ],
 })
 export class AppModule {}
