@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { convertToMiliSecondsUtil, cookieFactory, Public } from '@app/common';
-import { Request, Response } from 'express';
+import { convertToMiliSecondsUtil,  Public } from '@app/common';
+import {  Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
@@ -14,7 +14,6 @@ export class AuthController {
     private readonly envService: EnvService,
   ) {}
 
-  // public
   @Public()
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
@@ -31,7 +30,6 @@ export class AuthController {
     return { accessToken };
   }
 
-  // auth
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     res.cookie('access_token', '', {
@@ -43,7 +41,6 @@ export class AuthController {
     return { success: true };
   }
 
-  // auth
   @Get('me')
   async getAuthenticateUser(@Req() req: RequestWithUser) {
     const userId = req.user.sub;

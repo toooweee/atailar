@@ -10,11 +10,11 @@ import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
     }),
-    AuthModule,
     EncryptionModule,
     EnvModule,
     PrismaModule,
