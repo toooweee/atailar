@@ -1,10 +1,9 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, AxiosError } from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Установи jwt-decode: npm install jwt-decode @types/jwt-decode
 import { eraseCookie, getCookie, setCookie } from '../utils/cookieService';
 import type { ApiResponse } from './types/apiResponse.ts';
-import type { DecodedToken } from './types/decodedToken.ts';
 import type { ApiError } from './types/apiError.ts';
 import { authApi } from './auth/AuthApi.ts';
+import type { Roles } from './auth/types/eunms/Roles.ts';
 
 export class ApiService {
   private axiosInstance: AxiosInstance;
@@ -57,61 +56,54 @@ export class ApiService {
     );
   }
 
-  async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async request<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await this.axiosInstance.request<ApiResponse<T>>(config);
+    console.log(response);
     return response.data;
   }
 
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'GET', url, ...config });
-  }
-
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'POST', url, data, ...config });
-  }
-
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'PUT', url, data, ...config });
-  }
-
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'DELETE', url, ...config });
-  }
-
-  getRoleFromToken(token: string): string | null {
-    try {
-      const decoded: DecodedToken = jwtDecode(token);
-      return decoded.role || null;
-    } catch (error) {
-      console.error('Invalid token:', error);
-      return null;
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.get<T>(url, config);
+    return {
+      data: response.data,
+      message: response.statusText,
     }
   }
 
-  getCurrentRole(): string | null {
-    let role = getCookie('userRole');
-    if (!role) {
-      const token = getCookie('authToken');
-      if (token) {
-        role = this.getRoleFromToken(token);
-        if (role) {
-          setCookie('userRole', role, 7);
-        }
-      }
+  async post<T, R>(url: string, data?: R, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.post<T>(url, data, config);
+    return {
+      data: response.data,
+      message: response.statusText,
     }
-    return role;
+  }
+
+  async put<T, R>(url: string, data?: R, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.put<T>(url, data, config);
+    return {
+      data: response.data,
+      message: response.statusText,
+    }
+  }
+
+  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.delete<T>(url, config);
+    return {
+      data: response.data,
+      message: response.statusText,
+    }
   }
 
   setAuthToken(token: string): void {
     setCookie('authToken', token, 7);
-    const role = this.getRoleFromToken(token);
-    if (role) {
-      setCookie('userRole', role, 7);
-    }
   }
 
   setRefreshToken(refreshToken: string): void {
-    setCookie('refreshToken', refreshToken, 7);
+    setCookie('refreshToken', refreshToken, 30);
+  }
+
+  setRoleFromToken(role: Roles): void {
+    setCookie('userRole', role, 30)
   }
 
   clearAuthToken(): void {

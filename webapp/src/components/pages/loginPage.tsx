@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Alert, Container, Avatar } from '@mui/material';
-import { useSnackbar } from '../../contexts/SnackbarProvider.tsx';
 import type { LoginRequest } from '../../api/auth/types/request/LoginRequest.ts';
 import { authApi } from '../../api/auth/AuthApi.ts';
+import { Roles } from '../../api/auth/types/eunms/Roles.ts';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { showMessage } = useSnackbar();
+  // const { showMessage } = useSnackbar();
 
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
@@ -16,21 +16,25 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       const data = await authApi.login(form);
-      if (data)
-        switch (data) {
-          case 'Admin':
-            navigate('/admin');
-            break;
-          case 'User':
-            navigate('/client');
-            break;
-          default:
-            navigate('/');
+      if (data) {
+        const meInfo = await authApi.getMeInformation();
+        console.log(meInfo);
+        if (meInfo) {
+          switch (meInfo.role) {
+            case Roles.ADMIN:
+              navigate('/admin');
+              break;
+            case Roles.USER:
+              navigate('/client');
+              break;
+            default:
+              setError('Произошла ошибка при входе')
+              setForm({ email: '', password: '' })
+              break;
+          }
         }
-      else showMessage({
-        message: 'Произошла ошибка при входе',
-        severity: 'error',
-      });
+      }
+      else setError('Произошла ошибка при входе')
     } catch (err: any) {
       setError(err.message);
     }
