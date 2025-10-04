@@ -2,25 +2,28 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Alert, Container, Avatar } from '@mui/material';
 import { useSnackbar } from '../../contexts/SnackbarProvider.tsx';
+import type { LoginRequest } from '../../api/auth/types/request/LoginRequest.ts';
+import { authApi } from '../../api/auth/AuthApi.ts';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { showMessage } = useSnackbar();
 
-  const [form, setForm] = useState({ userName: '', password: '' });
+  const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // const data = await execute(() => loginApi(form), 'Вход выполнен успешно');
-      // setUser(data.user); // data is now typed as AuthResponse
-      // navigate('/');
-    } catch (err: any) {
-      showMessage({
-        message: err.message || 'Произошла ошибка при входе',
+      const data = await authApi.login(form);
+      if(data.data)
+        navigate('/');
+      else showMessage({
+        message: 'Произошла ошибка при входе',
         severity: 'error',
       });
+    } catch (err: any) {
+      setError(err.message)
     }
   };
 
@@ -57,12 +60,12 @@ const LoginPage: React.FC = () => {
             required
             fullWidth
             id="userName"
-            label="Имя пользователя"
+            label="Email пользователя"
             name="userName"
-            autoComplete="username"
+            autoComplete="email"
             autoFocus
-            value={form.userName}
-            onChange={e => setForm({ ...form, userName: e.target.value })}
+            value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })}
           />
           <TextField
             margin="normal"

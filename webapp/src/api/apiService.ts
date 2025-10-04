@@ -1,21 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import jwtDecode from 'jwt-decode'; // Установи jwt-decode: npm install jwt-decode @types/jwt-decode
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, AxiosError } from 'axios';
+import { jwtDecode } from 'jwt-decode'; // Установи jwt-decode: npm install jwt-decode @types/jwt-decode
 import { eraseCookie, getCookie, setCookie } from '../utils/cookieService';
-
-interface ApiResponse<T = any> {
-  data: T;
-  message?: string;
-}
-
-interface ApiError {
-  message: string;
-  status?: number;
-}
-
-interface DecodedToken {
-  role?: string;
-  [key: string]: any;
-}
+import type { ApiResponse } from './types/apiResponse.ts';
+import type { DecodedToken } from './types/decodedToken.ts';
+import type { ApiError } from './types/apiError.ts';
+import { authApi } from './auth/AuthApi.ts';
 
 export class ApiService {
   private axiosInstance: AxiosInstance;
@@ -27,7 +16,7 @@ export class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      withCredentials: true, // Для отправки cookies с запросами (если сервер поддерживает)
+      withCredentials: true,
     });
 
     this.axiosInstance.interceptors.request.use((config) => {
@@ -45,6 +34,7 @@ export class ApiService {
         if (error.response?.data?.message) {
           errorMessage = error.response.data.message;
         } else if (error.response?.status === 401) {
+          // authApi.refreshToken(refreshToken)
           errorMessage = 'Сессия истекла. Пожалуйста, войдите заново.';
           this.clearAuthToken(); // todo перезапрос токена
         } else if (error.response?.status === 403) {
@@ -81,22 +71,6 @@ export class ApiService {
     return this.request<T>({ method: 'DELETE', url, ...config });
   }
 
-  async execute<T>(
-    operation: () => Promise<T>,
-    successMessage?: string,
-    errorMessage?: string
-  ): Promise<T> {
-    try {
-      const result = await operation();
-      if (successMessage) {
-      }
-      return result;
-    } catch (error: any) {
-      const msg = errorMessage || error.message || 'Произошла ошибка при выполнении операции';
-      throw error;
-    }
-  }
-
   getRoleFromToken(token: string): string | null {
     try {
       const decoded: DecodedToken = jwtDecode(token);
@@ -129,13 +103,13 @@ export class ApiService {
     }
   }
 
+  setRefreshToken(refreshToken: string): void {
+    setCookie('refreshToken', refreshToken, 7);
+  }
+
   clearAuthToken(): void {
     eraseCookie('authToken');
     eraseCookie('userRole');
   }
 }
 
-export const createApiService = (baseUrl: string, timeOut?: number) => {
-  const service = new ApiService(baseUrl, timeOut);
-  return service;
-};
