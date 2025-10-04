@@ -15,8 +15,8 @@ const AdminPage = () => {
   const role = getCurrentRole();
 
   useEffect(() => {
-    if(role !== Roles.ADMIN)
-      navigate('/login')
+    if (role !== Roles.ADMIN)
+      navigate('/login');
   }, []);
 
   return (
@@ -26,16 +26,16 @@ const AdminPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Админ-панель
           </Typography>
-          <Button color="inherit" onClick={() => setCurrentTab(<UserPage/>)}>
+          <Button color="inherit" onClick={() => setCurrentTab(<UserPage />)}>
             Управление пользователями
           </Button>
-          <Button color="inherit" onClick={() => setCurrentTab(<RequestPage/>)}>
+          <Button color="inherit" onClick={() => setCurrentTab(<RequestPage />)}>
             Управление заявками
           </Button>
-          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage/>)}>
+          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage />)}>
             Аудит
           </Button>
-          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage/>)}>
+          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage />)}>
             Выйти из системы
           </Button>
         </Toolbar>

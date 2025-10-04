@@ -1,11 +1,19 @@
+// src/components/users/UsersTable.tsx
 import React from 'react';
+import { Typography } from '@mui/material';
+import UsersListTable from './UsersListTable.tsx';
+import type { UserInfo } from '../../../api/users/types/response/UserInfo.ts';
 
-const UsersTable = () => {
-  return (
-    <div>
+interface UsersTableProps {
+  users: UserInfo[];
+}
 
-    </div>
-  );
+const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+  if (users.length === 0) {
+    return <Typography>Нет пользователей</Typography>;
+  }
+
+  return <UsersListTable users={users} />;
 };
 
 export default UsersTable;

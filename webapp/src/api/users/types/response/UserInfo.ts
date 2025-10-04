@@ -1,4 +1,5 @@
-export interface UserInfo {
-  id: string;
-  email: string;
-}
+  export interface UserInfo {
+    id: string;
+    fullName: string;
+    email: string;
+  }
