@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import RequestTable from '../components/request/RequestTable.tsx';
-import type { AccessRequest } from '../../api/accessRequest/types/response/AccessRequest.ts';
-import { useLoading } from '../../hooks/useLoading.ts';
-import { accessRequestApi } from '../../api/accessRequest/accessRequestApi.ts';
-import { useSnackbar } from '../../contexts/SnackbarProvider.tsx';
+import RequestTable from '../../components/request/RequestTable.tsx';
+import type { AccessRequest } from '../../../api/accessRequest/types/response/AccessRequest.ts';
+import { useLoading } from '../../../hooks/useLoading.ts';
+import { accessRequestApi } from '../../../api/accessRequest/accessRequestApi.ts';
+import { useSnackbar } from '../../../contexts/SnackbarProvider.tsx';
 
 const RequestPage = () => {
   const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);

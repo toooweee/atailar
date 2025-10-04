@@ -1,18 +1,14 @@
-// src/pages/AuditPage.tsx (отдельная страница для аудита, похожа на вкладку)
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, CircularProgress } from '@mui/material';
-import AuditLogTable from '../components/audit/AuditLogTable';
+import AuditLogTable, { type AuditLog } from '../../components/audit/AuditLogTable.tsx';
 
 const AuditPage: React.FC = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // GET /api/audit
     const fetchLogs = async () => {
       try {
-        // const response = await axios.get('/api/audit');
-        // setLogs(response.data);
       } catch (err) {
         console.error(err);
       } finally {

@@ -10,7 +10,7 @@ import {
   Paper,
 } from '@mui/material';
 
-interface AuditLog {
+export interface AuditLog {
   id: string;
   userId: string;
   action: string;

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Container, Typography } from '@mui/material';
-import UsersTable from '../components/users/UsersTable.tsx';
-import UserForm from '../components/users/UserForm.tsx';
-import { usersApi } from '../../api/users/UsersApi.ts';
-import type { UserInfo } from '../../api/users/types/response/UserInfo.ts';
-import { useLoading } from '../../hooks/useLoading.ts';
-import { useSnackbar } from '../../contexts/SnackbarProvider.tsx';
+import UsersTable from '../../components/users/UsersTable.tsx';
+import UserForm from '../../components/users/UserForm.tsx';
+import { usersApi } from '../../../api/users/UsersApi.ts';
+import type { UserInfo } from '../../../api/users/types/response/UserInfo.ts';
+import { useLoading } from '../../../hooks/useLoading.ts';
+import { useSnackbar } from '../../../contexts/SnackbarProvider.tsx';
 
 const UserPage = () => {
   const [users, setUsers] = useState<UserInfo[]>([]);

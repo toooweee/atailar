@@ -3,9 +3,10 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { Roles } from '../../api/auth/types/eunms/Roles.ts';
 import { useNavigate } from 'react-router-dom';
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
-import UserPage from './UsersPage.tsx';
-import RequestPage from './RequestPage.tsx';
-import AuditPage from './AuditPage.tsx';
+import UserPage from './Admin/UsersPage.tsx';
+import RequestPage from './Admin/RequestPage.tsx';
+import AuditPage from './Admin/AuditPage.tsx';
+import { authApi } from '../../api/auth/AuthApi.ts';
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,13 @@ const AdminPage = () => {
     if (role !== Roles.ADMIN)
       navigate('/login');
   }, []);
+
+  const logout = async () => {
+    setCurrentTab(undefined);
+    const response = await authApi.logout();
+    if(response?.success)
+      navigate('/login');
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -35,7 +43,7 @@ const AdminPage = () => {
           <Button color="inherit" onClick={() => setCurrentTab(<AuditPage />)}>
             Аудит
           </Button>
-          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage />)}>
+          <Button color="inherit" onClick={() => logout()}>
             Выйти из системы
           </Button>
         </Toolbar>

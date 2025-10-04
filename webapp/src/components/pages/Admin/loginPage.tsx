@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Alert, Container, Avatar } from '@mui/material';
-import type { LoginRequest } from '../../api/auth/types/request/LoginRequest.ts';
-import { authApi } from '../../api/auth/AuthApi.ts';
-import { Roles } from '../../api/auth/types/eunms/Roles.ts';
-import { getAccessToken, getCurrentRole } from '../../utils/tokenAndRoleUtils.ts';
+import type { LoginRequest } from '../../../api/auth/types/request/LoginRequest.ts';
+import { authApi } from '../../../api/auth/AuthApi.ts';
+import { Roles } from '../../../api/auth/types/eunms/Roles.ts';
+import { getAccessToken, getCurrentRole } from '../../../utils/tokenAndRoleUtils.ts';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
         navigate('/admin');
         break;
       case Roles.USER:
-        navigate('/client');
+        navigate('/user');
         break;
       default:
         setError('Произошла ошибка при входе');
@@ -71,7 +71,7 @@ const LoginPage: React.FC = () => {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 200, height: 200 }}>
-            <img src="../../../public/logo.png" alt="Logo" style={{ width: '100%', height: '100%' }} />
+            <img src="../../../../public/logo.png" alt="Logo" style={{ width: '100%', height: '100%' }} />
           </Avatar>
           <Typography component="h1" variant="h5">
             Вход
