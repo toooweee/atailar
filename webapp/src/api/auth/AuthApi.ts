@@ -5,6 +5,7 @@ import type { ApiService } from '../apiService.ts';
 import type { LoginRequest } from './types/request/LoginRequest.ts';
 import type { AuthResponse } from './types/response/AuthResponse.ts';
 import type { MeResponse } from './types/response/MeResponse.ts';
+import type { ResponseResult } from '../request/types/ResponseResult.ts';
 
 export class AuthApi {
   private api: ApiService;
@@ -55,10 +56,10 @@ export class AuthApi {
     return undefined;
   }
 
-  async logout(): Promise<void> {
+  async logout(): Promise<ResponseResult> {
     try {
-      const
-    } catch (error: any) {
+      const response = await this.api.post<ResponseResult, unknown>(authApi.endPoint.logout,);
+      return response.data
     } finally {
       this.api.clearAuthToken();
     }

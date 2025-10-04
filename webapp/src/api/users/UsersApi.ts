@@ -46,7 +46,7 @@ export class UsersApi {
     return undefined;
   }
 
-  async logout(): Promise<void> {
+  async changePassword(): Promise<void> {
     try {
     } catch (error: any) {
     } finally {
