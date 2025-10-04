@@ -1,19 +1,47 @@
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateAccessRequestDto } from './dtos/create-access-request.dto';
+import { StatusRequest } from 'generated/prisma';
 
 @Injectable()
 export class AccessRequestsService {
   constructor(private readonly prisma: PrismaService) {
   }
 
-  create() {
-    // сохранить заявку в бд
-    // отправить на email заявка с кнопками на одобрение и отклонение заявки
+  create(userId: string, dto: CreateAccessRequestDto) {
+    return this.prisma.accessRequest.create({
+      data: {
+        userId,
+        secretId: dto.secretId,
+        comment: dto.comment
+      }
+    })
   }
 
-  findAll() {}
+  findAll() {
+    return this.prisma.accessRequest.findMany();
+  }
 
-  approve(accessRequestId: string) {}
+  approve(accessRequestId: string) {
+    return this.prisma.accessRequest.update({
+      where: {
+        id: accessRequestId
+      },
+      data: {
+        status: StatusRequest.APPROVED
+      }
+    })
+  }
 
-  reject(accessRequestId: string) {}
+  reject(accessRequestId: string) {
+    return this.prisma.accessRequest.update({
+      where: {
+        id: accessRequestId
+      },
+      data: {
+        status: StatusRequest.REJECTED
+      }
+    })
+  }
 }

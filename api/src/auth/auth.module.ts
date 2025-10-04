@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { EncryptionModule } from '../encryption/encryption.module';
 import { RefreshTokenGuard } from './guards/refresh.guard';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { RefreshTokenGuard } from './guards/refresh.guard';
       }),
       inject: [EnvService],
     }),
-    EncryptionModule
+    EncryptionModule,
   ],
   providers: [
     AuthService,

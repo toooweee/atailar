@@ -16,6 +16,15 @@ export class Env {
 
   @IsString()
   RT_EXPIRES_IN: string;
+
+  @IsString()
+  EMAIL_SERVICE: string;
+
+  @IsString()
+  EMAIL_USER: string;
+
+  @IsString()
+  EMAIL_PASSWORD: string;
 }
 
 export function validate(config: Record<string, unknown>) {

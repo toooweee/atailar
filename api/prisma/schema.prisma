@@ -69,7 +69,7 @@ model AccessRequest {
   userId   String?
   secretId String?
   comment  String
-  status   StatusRequest
+  status   StatusRequest @default(PENDING)
 
   createdAt DateTime @default(now())
 

@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { convertToMiliSecondsUtil, cookieFactory, Public } from '@app/common';
+import { convertToMiliSecondsUtil, cookieFactory, Public, User } from '@app/common';
 import {  Response, Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { EnvService } from '../env/env.service';
-import RequestWithUser from './requests/user.request';
 import { RefreshTokenGuard } from './guards/refresh.guard';
 import { RefreshTokenPayload } from './types/refresh.payload';
+import { UserPayload } from './types/user.payload';
 
 @Controller('auth')
 export class AuthController {
@@ -54,9 +54,8 @@ export class AuthController {
   }
 
   @Get('me')
-  async getAuthenticateUser(@Req() req: RequestWithUser) {
-    const userId = req.user.sub;
-    const user = await this.authService.me(userId);
+  async getAuthenticateUser(@User() currentUser: UserPayload) {
+    const user = await this.authService.me(currentUser.sub);
 
     return user;
   }
@@ -64,14 +63,13 @@ export class AuthController {
   @Public()
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refreshTokens(@Req() req: Request & { user: RefreshTokenPayload}, @Res({passthrough: true}) res: Response) {
+  async refreshTokens(@User() currentUser:  RefreshTokenPayload, @Res({passthrough: true}) res: Response, @Req() req: Request) {
     const cookies = cookieFactory(res, req);
 
-    const userId = req.user['userId'];
     const oldRefresh = cookies.get('refresh_token') ?? '';
 
     const { accessToken, refreshToken } = await this.authService.refreshTokens(
-      userId,
+      currentUser.userId,
       oldRefresh,
     );
 
