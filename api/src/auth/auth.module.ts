@@ -5,11 +5,13 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvService } from '../env/env.service';
 import { EnvModule } from '../env/env.module';
-import { EncryptionModule } from '../encryption/encryption.module';
+import { UsersModule } from '../users/users.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
-    EncryptionModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [EnvModule],
       useFactory: (envService: EnvService) => ({
@@ -22,7 +24,13 @@ import { EncryptionModule } from '../encryption/encryption.module';
       inject: [EnvService],
     }),
   ],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

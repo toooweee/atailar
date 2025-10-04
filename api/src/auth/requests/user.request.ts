@@ -1,8 +1,8 @@
 import { Request } from 'express';
-import { User } from 'generated/prisma';
+import { UserPayload } from '../types/user.payload';
 
 interface RequestWithUser extends Request {
-  user: User;
+  user: UserPayload;
 }
 
 export default RequestWithUser;
