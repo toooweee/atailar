@@ -2,14 +2,13 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dtos/login.dto';
 import { UserPayload } from './types/user.payload';
 import { JwtService } from '@nestjs/jwt';
-import { UserM } from './entities/user';
 import { UsersService } from '../users/users.service';
 import { EnvService } from '../env/env.service';
 import { convertToMiliSecondsUtil } from '@app/common';
-import { RefreshTokenPayload } from './types/refresh.payload';
 import { addMilliseconds } from 'date-fns';
 import { EncryptionService } from '../encryption/encryption.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UserM } from '../users/entities/user';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +17,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly envService: EnvService,
     private readonly encryptionService: EncryptionService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async login(dto: LoginDto) {
@@ -26,40 +25,36 @@ export class AuthService {
 
     const { accessToken, refreshToken } = await this.issuingTokens(user);
 
-
     return { accessToken, refreshToken };
   }
 
   async me(userId: string) {
     const user = await this.usersService.findOneById(userId);
 
-    if(user.isFirstLogin) {
+    if (user.isFirstLogin) {
       await this.prisma.user.update({
         where: {
-          id: user.id
+          id: user.id,
         },
         data: {
-          isFirstLogin: false
-        }
-      })
+          isFirstLogin: false,
+        },
+      });
     }
 
-    return user;
+    return new UserM(user);
   }
 
-  async refreshTokens(userId: string, oldRefresh: string){
+  async refreshTokens(userId: string, oldRefresh: string) {
     const storedToken = await this.prisma.refreshToken.findUnique({
       where: {
-        userId
-      }
+        userId,
+      },
     });
     if (!storedToken) {
       throw new UnauthorizedException('No Refresh Token Found');
     }
-    const isVerifyTokens = await this.encryptionService.verifyPassword(
-      oldRefresh,
-      storedToken.tokenHash,
-    );
+    const isVerifyTokens = await this.encryptionService.verifyPassword(oldRefresh, storedToken.tokenHash);
     if (!isVerifyTokens) {
       throw new UnauthorizedException('Invalid Refresh Token');
     }
@@ -80,9 +75,7 @@ export class AuthService {
     return expiresAt;
   }
 
-  private async generateRt(
-    refreshTokenPayload: { userId: string | undefined; expiresAt: Date },
-  ): Promise<string> {
+  private async generateRt(refreshTokenPayload: { userId: string | undefined; expiresAt: Date }): Promise<string> {
     const refreshToken = await this.jwtService.signAsync(refreshTokenPayload, {
       secret: this.envService.get('RT_JWT_SECRET'),
       expiresIn: this.envService.get('RT_EXPIRES_IN'),
@@ -95,7 +88,7 @@ export class AuthService {
       sub: user.id!,
       email: user.email,
       role: user.role!,
-      isFirstLogin: user.isFirstLogin!
+      isFirstLogin: user.isFirstLogin!,
     });
 
     const expiresAt = this.getRtExp();
@@ -105,18 +98,18 @@ export class AuthService {
     const tokenHash = await this.encryptionService.hashPassword(refreshToken);
     await this.prisma.refreshToken.upsert({
       where: {
-        userId: user.id
+        userId: user.id,
       },
       update: {
         expiresAt,
         tokenHash,
         userId: user.id,
       },
-       create: {
-         expiresAt,
-         tokenHash,
-         userId: user.id,
-       }
+      create: {
+        expiresAt,
+        tokenHash,
+        userId: user.id,
+      },
     });
 
     return { accessToken, refreshToken };

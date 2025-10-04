@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAccessRequestDto } from './dtos/create-access-request.dto';
@@ -23,7 +23,17 @@ export class AccessRequestsService {
     return this.prisma.accessRequest.findMany();
   }
 
-  approve(accessRequestId: string) {
+  async approve(accessRequestId: string) {
+    const accessRequest = await this.prisma.accessRequest.findUnique({
+      where: {
+        id: accessRequestId
+      }
+    });
+    if(!accessRequest) {
+      throw new NotFoundException('Access request not found')
+    }
+
+    // отправить уведомление пользователю
     return this.prisma.accessRequest.update({
       where: {
         id: accessRequestId
@@ -34,7 +44,17 @@ export class AccessRequestsService {
     })
   }
 
-  reject(accessRequestId: string) {
+  async reject(accessRequestId: string) {
+    const accessRequest = await this.prisma.accessRequest.findUnique({
+      where: {
+        id: accessRequestId
+      }
+    });
+    if(!accessRequest) {
+      throw new NotFoundException('Access request not found')
+    }
+
+    // отправить уведомление пользователю
     return this.prisma.accessRequest.update({
       where: {
         id: accessRequestId
