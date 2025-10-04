@@ -2,51 +2,42 @@ import { env } from '../../env.ts';
 import { createApiService } from '../createApiService.ts';
 import type { ApiResponse } from '../types/apiResponse.ts';
 import type { ApiService } from '../apiService.ts';
-import type { LoginRequest } from './types/request/LoginRequest.ts';
-import type { AuthResponse } from './types/response/AuthResponse.ts';
-import type { MeResponse } from './types/response/MeResponse.ts';
+import type { UserInfo } from './types/response/UserInfo.ts';
+import type { CreateUser } from './types/request/CreateUser.ts';
 
-export class AuthApi {
+export class UsersApi {
   private api: ApiService;
 
   public endPoint = {
-    me: env.REACT_APP_AUTH_ME,
-    login: env.REACT_APP_AUTH_LOGIN,
-    logout: env.REACT_APP_AUTH_LOGOUT,
-    refresh: env.REACT_APP_AUTH_REFRESH,
+    changePassword: env.REACT_APP_USERS_CHANGE_PASSWORD,
   }
 
   constructor() {
     this.api = createApiService(
-      env.REACT_APP_AUTH,
+      env.REACT_APP_USERS,
       10000
     );
   }
 
-  async login(credentials: LoginRequest): Promise<boolean> {
+  async findAllUsers(): Promise<UserInfo[]> {
     try {
-      const response = await this.api.post<AuthResponse, LoginRequest>(
+      const response = await this.api.get<UserInfo[]>(
         authApi.endPoint.login,
-        credentials
       );
-      if (response.data?.accessToken) {
-        this.api.setAuthToken(response.data?.accessToken);
-        if (response.data?.refreshToken) {
-          this.api.setRefreshToken(response.data?.refreshToken);
-          return true
-        }
-        return true
+      if (response.data) {
+        return response.data;
       }
-      return false
+      return []
     } catch (e) {
       //throw new Error(error.message || 'Ошибка при входе в систему');
-      return false
+      return []
     }
   }
 
-  async getMeInformation(): Promise<MeResponse | undefined> {
-    const response = await this.api.get<MeResponse>(
-      authApi.endPoint.me,
+  async createUser(createUser: CreateUser): Promise<UserInfo | undefined> {
+    const response = await this.api.post<UserInfo>(
+      '',
+      createUser
     );
     if(response) {
       this.api.setRoleFromToken(response.data?.role);
@@ -57,7 +48,6 @@ export class AuthApi {
 
   async logout(): Promise<void> {
     try {
-      const
     } catch (error: any) {
     } finally {
       this.api.clearAuthToken();

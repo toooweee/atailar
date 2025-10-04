@@ -1,11 +1,16 @@
 import { getCurrentRole } from '../../utils/tokenAndRoleUtils.ts';
-import { useEffect } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Roles } from '../../api/auth/types/eunms/Roles.ts';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import UserPage from './UsersPage.tsx';
+import RequestPage from './RequestPage.tsx';
+import AuditPage from './AuditPage.tsx';
 
 const AdminPage = () => {
   const navigate = useNavigate();
+
+  const [currentTab, setCurrentTab] = useState<ReactNode>(undefined);
 
   const role = getCurrentRole();
 
@@ -21,22 +26,22 @@ const AdminPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Админ-панель
           </Typography>
-          <Button color="inherit" component={Link} to="/admin/users">
+          <Button color="inherit" onClick={() => setCurrentTab(<UserPage/>)}>
             Управление пользователями
           </Button>
-          <Button color="inherit" component={Link} to="/admin/dashboard">
+          <Button color="inherit" onClick={() => setCurrentTab(<RequestPage/>)}>
             Управление заявками
           </Button>
-          <Button color="inherit" component={Link} to="admin/audit">
+          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage/>)}>
             Аудит
+          </Button>
+          <Button color="inherit" onClick={() => setCurrentTab(<AuditPage/>)}>
+            Выйти из системы
           </Button>
         </Toolbar>
       </AppBar>
       <Box component="main" sx={{ p: 3 }}>
-        {/* Здесь будут роуты или контент админ-панели, e.g., Outlet из react-router */}
-        <Typography variant="h4">
-          Добро пожаловать в админ-панель. Выберите раздел в меню выше.
-        </Typography>
+        {currentTab}
       </Box>
     </Box>
   );
