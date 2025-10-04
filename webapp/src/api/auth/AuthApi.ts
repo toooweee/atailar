@@ -20,7 +20,7 @@ export class AuthApi {
     );
   }
 
-  async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponse>> {
+  async login(credentials: LoginRequest): Promise<string | null> {
     try {
       const response = await this.api.post<AuthResponse>(
         authApi.endPoint.login,
@@ -28,12 +28,13 @@ export class AuthApi {
       );
       if (response.data?.token) {
         this.api.setAuthToken(response.data.token);
+        if (response.data?.refresh) {
+          this.api.setRefreshToken(response.data.refresh);
+        }
+        return this.api.getRoleFromToken(response.data?.token);
       }
+      return null;
 
-      if (response.data?.refresh) {
-        this.api.setRefreshToken(response.data.refresh);
-      }
-      return response;
     } catch (error: any) {
       throw new Error(error.message || 'Ошибка при входе в систему');
     }

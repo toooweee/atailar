@@ -34,9 +34,16 @@ export class ApiService {
         if (error.response?.data?.message) {
           errorMessage = error.response.data.message;
         } else if (error.response?.status === 401) {
-          // authApi.refreshToken(refreshToken)
-          errorMessage = 'Сессия истекла. Пожалуйста, войдите заново.';
-          this.clearAuthToken(); // todo перезапрос токена
+          const refreshToken = getCookie('refreshToken');
+          if(refreshToken) {
+            try {
+              authApi.refreshToken(refreshToken);
+            }
+            catch (error) {
+              errorMessage = 'Сессия истекла. Пожалуйста, войдите заново.';
+              this.clearAuthToken();
+            }
+          }
         } else if (error.response?.status === 403) {
           errorMessage = 'Доступ запрещен.';
         } else if (error.response?.status === 404) {
@@ -109,6 +116,7 @@ export class ApiService {
 
   clearAuthToken(): void {
     eraseCookie('authToken');
+    eraseCookie('refreshToken');
     eraseCookie('userRole');
   }
 }

@@ -16,14 +16,23 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       const data = await authApi.login(form);
-      if(data.data)
-        navigate('/');
+      if (data)
+        switch (data) {
+          case 'Admin':
+            navigate('/admin');
+            break;
+          case 'User':
+            navigate('/client');
+            break;
+          default:
+            navigate('/');
+        }
       else showMessage({
         message: 'Произошла ошибка при входе',
         severity: 'error',
       });
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     }
   };
 
