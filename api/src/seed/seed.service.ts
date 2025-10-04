@@ -19,7 +19,7 @@ export class SeedService implements OnModuleInit {
   private async seedUsers() {
     const passwordHash = await this.encryptionService.hashPassword('asdfjkl');
 
-    const users = [{ id: 'uuid', email: 'admin@gmail.com', passwordHash, role: Role.ADMIN }];
+    const users = [{ id: 'uuid', email: 'admin@gmail.com', fullName: 'Гадиляев Ислам Ильгамович', passwordHash, role: Role.ADMIN }];
 
     for (const user of users) {
       await this.prisma.user.upsert({

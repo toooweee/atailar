@@ -10,6 +10,7 @@ import { SeedModule } from './seed/seed.module';
 import { AccessRequestsModule } from './access-requests/access-requests.module';
 import { MailModule } from './mail/mail.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { SecretsModule } from './secrets/secrets.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
     AccessRequestsModule,
     MailModule,
     AuditLogsModule,
+    SecretsModule,
   ],
 })
 export class AppModule {}
