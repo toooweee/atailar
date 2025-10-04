@@ -111,7 +111,8 @@ export class ApiService {
   }
 
   setRoleFromToken(role: Roles): void {
-    setCookie('userRole', role, 30)
+    // setCookie('userRole', role, 30)
+    setCookie('userRole', 'USER', 30)
   }
 
   clearAuthToken(): void {

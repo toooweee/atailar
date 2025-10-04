@@ -2,6 +2,7 @@ import { env } from '../../env.ts';
 import { createApiService } from '../createApiService.ts';
 import type { ApiService } from '../apiService.ts';
 import type { AccessRequest } from './types/response/AccessRequest.ts';
+import type { CreateAccessRequest } from './types/request/CreateAccessRequest.ts';
 
 export class AccessRequestApi {
   private api: ApiService;
@@ -29,6 +30,35 @@ export class AccessRequestApi {
       return []
     } catch (e) {
       return []
+    }
+  }
+
+  async getMyAccessRequests(): Promise<AccessRequest[]> {
+    try {
+      const response = await this.api.get<AccessRequest[]>(
+        '/my',
+      );
+      if (response.data) {
+        return response.data;
+      }
+      return []
+    } catch (e) {
+      return []
+    }
+  }
+
+  async createAccessRequest(request: CreateAccessRequest): Promise<AccessRequest | undefined> {
+    try {
+      const response = await this.api.post<AccessRequest, typeof request>(
+        '',
+        request
+      );
+      if (response.data) {
+        return response.data;
+      }
+      return undefined;
+    } catch (e) {
+      return undefined;
     }
   }
 

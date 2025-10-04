@@ -5,7 +5,7 @@ export const env: Env = {
   REACT_APP_AUTH: '/auth',
   REACT_APP_USERS: '/users',
   REACT_APP_ACCESS_REQUEST: '/access-requests',
-  REACT_APP_SECRET: '/secret',
+  REACT_APP_SECRETS: '/secrets',
   REACT_APP_AUTH_LOGIN: '/login',
   REACT_APP_AUTH_LOGOUT: 'logout',
   REACT_APP_AUTH_REFRESH: '/refresh',
