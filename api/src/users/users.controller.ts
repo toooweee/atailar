@@ -1,13 +1,12 @@
 import { Body, Controller, Get, Patch, Post, UseGuards,  Req } from '@nestjs/common';
-import {Request} from 'express'
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Role } from '../../generated/prisma';
-import { Roles } from '@app/common/decorators/roles.decorator';
 import { ChangePasswordDto } from './dtos/change-password.dto';
-import RequestWithUser from '../auth/requests/user.request';
+import { Roles, User } from '@app/common';
+import { UserPayload } from '../auth/types/user.payload';
 
 @Controller('users')
 export class UsersController {
@@ -28,9 +27,7 @@ export class UsersController {
   }
 
   @Patch('update-password')
-  changePassword(@Body() changePasswordDto: ChangePasswordDto, @Req() req: RequestWithUser) {
-    const userId = req.user.sub;
-
-    return this.usersService.changePassword(userId, changePasswordDto);
+  changePassword(@Body() changePasswordDto: ChangePasswordDto, @User() currentUser: UserPayload) {
+    return this.usersService.changePassword(currentUser.sub, changePasswordDto);
   }
 }
