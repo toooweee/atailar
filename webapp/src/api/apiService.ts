@@ -86,6 +86,14 @@ export class ApiService {
     }
   }
 
+  async patch<T, R>(url: string, data?: R, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.patch<T>(url, data, config);
+    return {
+      data: response.data,
+      message: response.statusText,
+    }
+  }
+
   async delete<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await this.axiosInstance.delete<T>(url, config);
     return {
@@ -103,7 +111,8 @@ export class ApiService {
   }
 
   setRoleFromToken(role: Roles): void {
-    setCookie('userRole', role, 30)
+    // setCookie('userRole', role, 30)
+    setCookie('userRole', 'USER', 30)
   }
 
   clearAuthToken(): void {
