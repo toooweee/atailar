@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as generator from 'generate-password';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -17,6 +17,15 @@ export class UsersService {
   ) {}
 
   async createUser(dto: CreateUserDto) {
+    const existsUser = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    if (existsUser) {
+      throw new ConflictException('User already exists');
+    }
+
     const password = generator.generate({
       length: 12,
       numbers: true,
@@ -25,7 +34,8 @@ export class UsersService {
       lowercase: true,
       excludeSimilarCharacters: true,
     });
-    console.log(password);
+    const emailPassword = password;
+    console.log(emailPassword);
 
     const passwordHash = await this.encryptionService.hashPassword(password);
 
@@ -52,7 +62,7 @@ export class UsersService {
       <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
         <p style="margin: 0; color: #333;">
           <strong>Email:</strong> ${dto.email}<br>
-          <strong>Пароль:</strong> ${password}
+          <strong>Пароль:</strong> ${emailPassword}
         </p>
       </div>
 

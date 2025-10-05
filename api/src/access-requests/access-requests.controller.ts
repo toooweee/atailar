@@ -13,7 +13,7 @@ export class AccessRequestsController {
 
   @Post()
   createAccessRequest(@Body() createAccessRequestDto: CreateAccessRequestDto, @User() currentUser: UserPayload) {
-    return this.accessRequestsService.create(currentUser.sub, createAccessRequestDto)
+    return this.accessRequestsService.create(currentUser.sub, createAccessRequestDto);
   }
 
   @UseGuards(RolesGuard)
@@ -21,6 +21,11 @@ export class AccessRequestsController {
   @Get()
   getAllAccessRequests() {
     return this.accessRequestsService.findAll();
+  }
+
+  @Get('my')
+  getMyAccessRequests(@User() user: UserPayload) {
+    return this.accessRequestsService.findAllMy(user.sub);
   }
 
   @UseGuards(RolesGuard)
