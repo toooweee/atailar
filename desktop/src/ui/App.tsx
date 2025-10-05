@@ -1,26 +1,60 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import './App.css';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import LayoutPage from './pages/Layout.page.tsx';
+import MainPage from './pages/Main/Main.page.tsx';
+import LoginPage from './pages/Login/Login.page.tsx';
+import SecretsPage from './pages/Secrets/Secrets.page.tsx';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  const handleLogin = () => {
+    localStorage.setItem('token', 'fake-jwt-token');
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
+
+  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+  };
+
+  const LoginRoute = ({ children }: { children: React.ReactNode }) => {
+    return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <LayoutPage onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<MainPage />} />
+        <Route path="/secrets" element={<SecretsPage />} />
+        <Route path="techniques" element={<div>Techniques Page</div>} />
+      </Route>
+
+      <Route
+        path="/login"
+        element={
+          <LoginRoute>
+            <LoginPage onLogin={handleLogin} />
+          </LoginRoute>
+        }
+      />
+    </Routes>
   );
 }
 

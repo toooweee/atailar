@@ -4,6 +4,10 @@
     "target": "ESNext",
     "module": "NodeNext",
     "outDir": "../../dist-electron",
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "declaration": true
+  },
 }
