@@ -16,7 +16,7 @@ export class UsersApi {
   constructor() {
     this.api = createApiService(
       env.REACT_APP_USERS,
-      10000
+      30000
     );
   }
 
